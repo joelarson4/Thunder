@@ -51,11 +51,11 @@ Standard argument values
 ------------------------
 Some of the below functions have arguments which will be found all over.  Here is how you can interpret them
 
-* *duration* : A duration value. 
-* *note*   : A string specifying a note in normal form.
-* *freq*   : A number reprezenting a Hz frequency.
-* *offset* : A positive or negative number of halfsteps to offset the supplied note.      
 * *id*     : The id specified when the `create()` function was called for the object you would like to retrieve.
+* *duration* : Either a ThDuration created by `Th.normalizeDuration()` or a number specifying the number of beats in the current tempo.
+* *freq*   : A number reprezenting a Hz frequency, such as 440.
+* *note*   : A string specifying a note in normal form such as "A", "Bb", "C#".
+* *pitch*  : Generally can be either a frequency (if a number) or a note (if a string).
 
 
 *Th* : The root of Thunder
@@ -98,7 +98,9 @@ Finally, there are some other functions which can be used to get basic informati
 * *getChannelCount() number*   : Returns the number of channels currently being used (1 or 2).
 * *getFrequencyForNote(note) number* : Returns the frequency (in Hz) of a given note.  E.g. `Th.getFrequencyForNote("A4")` will return 440.</span>
 * *getNoteForFrequency(freq) string* : Returns the note for a given frequency, if the frequency is within 0.5 of the "correct" value.  So `Th.getNoteForFrequency(439.8)` will return "A4".  The rounding is to allow for handling with compounded rounding issues.  However at high frequencies that may not be enough, and a better algorithm may end up being needed.
-* *getOffsetNote(note,offset) string* : Returns a new note based on the given note and offset.  `Th.offsetNote("A4",-5)` will return "E3".
+* *getOffsetNote(note,offset) string* : Returns a new note based on the given note and offset.  The offest parameter is a positive or negative number of halfsteps to offset the supplied note.  `Th.offsetNote("A4",-5)` will return "E3".
+* *normalizeDuration(duration) ThDuration* : Returns a normalized version of duration.  The argument is a string which can be various forms of specifying duration.  
+If duration is a function, it is called with no arguments, expecting a number to be returned which specifies the number of samples for this duration.  A number followed by a suffix of "m" or "ms" specifies milliseconds, e.g. "100m" means 100 milliseconds.  The suffix "b" means beats, so "2b" would mean two beats in the current tempo.  The suffix "s" means samples, so "431s" means 431 samples.  Finally, if duration is a number, it is assumed to be a number of beat.
 
 
 *Th.Sound* : The root for ThSound creation and retrieval.
@@ -176,8 +178,8 @@ The create function takes up to four arguments:
 -------------------------
 Creates and manages a Thunder Instrument, which contain related ThSounds with differing pitches, volumes, and other attributes.
 
-* *getSound(ptc [, opt]) ThSounds* : Returns a ThSound object with the specified pitch and optional settings.
-* *getId() ThInst*                 : Returns the id of this ThInst.
+* *getSound(pitch [, opt]) ThSounds* : Returns a ThSound object with the specified pitch and optional settings.
+* *getId() ThInst*                   : Returns the id of this ThInst.
         
 *Th.Sequence* : The root for ThSequence creation and retrieval.
 ---------------------------------------------------------------
