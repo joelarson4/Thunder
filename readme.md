@@ -1,7 +1,7 @@
-Welcome to Thunder!
-===================
+Welcome to Thunder.js!
+======================
 
-Thunder is a JavaScript library that aims to make it easy to create and play sounds in your browser.  Here are some examples of what you can do:
+Thunder.js is a JavaScript library that aims to make it easy to create and play sounds in your browser.  Here are some examples of what you can do:
 
     //create waves using simple math
     var sineFunc(pos, len, freq) { 
