@@ -1,0 +1,128 @@
+<html>
+<head>
+<script src="thunder.js"></script>
+<script>
+    Th.init();
+
+    var ThDemo={
+        sineFunc:function(si, len,  frq, chn, opt) {
+            var fad=Math.min(1,(opt.sustain || 1)*(len-si)/len); // used to fade out, to avoid an abrupt chop off of the wave, which causes a click.
+            return Math.floor(fad*128*256*(
+                Math.sin(2.0 * Math.PI * frq * si  / 44100)
+                ));            
+            }
+        };
+    </script>
+</head>
+<body>
+<h1>Thunder Demos</h1>
+
+<h2>ThSound</h2>
+
+<p>
+    <button onclick="ThDemo.soundSimple()">play</button> A simple sine.
+    <script>
+        ThDemo.soundSimple=function() {
+            Th.Sound.create("SoundSine",ThDemo.sineFunc).play();
+            }
+        </script>
+    </p>
+<p>
+    <button onclick="ThDemo.soundComplex()">play</button> A more complicated wave.
+    <script>
+        ThDemo.soundComplex=function() {
+            var fn1=function(si, len,  frq, chn, opt) {
+                var fad=(len-si)/len; 
+                var pan=1-((len-si)/len);
+                return Math.floor(pan*fad*128*256*(
+                    Math.cos(2.0 * Math.PI * frq * si  / 44100)*
+                    Math.sin(3.001 * Math.PI * frq * si  / 44100)
+                    ));        
+                };                 
+            var fn2=function(si, len,  frq, chn, opt) {
+                var fad=(len-si)/len; 
+                var pan=((len-si)/len);                
+                return Math.floor(pan*fad*128*256*(opt.distortion+1)*( //here we've used the option passed in
+                    Math.sin(2.0 * Math.PI * frq * si  / 44100)
+                    ));        
+                };
+            Th.Sound.create("SoundComplex",fn1,fn2,{distortion:3.1}).play();
+            }
+        </script>            
+    </p>
+
+<h2>ThInst</h2>
+<p>
+    <button onclick="ThDemo.instSimple('C')">play C</button> <button onclick="ThDemo.instSimple('314.159')">play 314.159 hz</button> <button onclick="ThDemo.instSimple('E#')">play E#</button> A simple instrument.
+    <script>
+        ThDemo.instSimple=function(arg) {
+            if(Th.Inst.get("InstSimple")==null) { //avoid recreating a bunch of times
+                Th.Inst.create("InstSimple",ThDemo.sineFunc);
+                }
+            Th.Inst.get("InstSimple").getSound(arg).play();
+            //Same as this:
+            //  Th.Inst.create("InstSimple",ThDemo.sineFunc).getSound("E#").play();
+            }
+        </script>            
+    </p>
+
+<h2>ThSound</h2>
+<p>
+    <button onclick="ThDemo.sequenceSimple()">play</button> A simple sequence.
+    <script>
+        ThDemo.sequenceSimple=function(arg) {
+            if(Th.Inst.get("InstSimple")==null) {
+                Th.Inst.create("InstSimple",ThDemo.sineFunc);
+                }
+            var score="close encounters: d=4,o=4,b=120: d, e, c, 8p, c3., 8p, 2g3";
+            Th.Sequence.create("CE Sine","InstSimple",score).play();
+            }
+        </script>            
+    </p>
+
+<p>
+    <button onclick="ThDemo.sequenceScooby()">play</button> A longer sequence.
+    <script>
+        ThDemo.sequenceScooby=function(arg) {
+            if(Th.Inst.get("InstSimple")==null) {
+                Th.Inst.create("InstSimple",ThDemo.sineFunc);
+                }
+            Th.Sequence.create("Scooby","InstSimple","ScoobyDoo:d=4,o=4,b=160:16e,16p,8e,16d,16p,8d,2c,8d,e,2a,8a,b,g3,e,8d,c,8d,2e,p,16e,16p,8e,16d,16p,8d,2c,8d,f,2a,8a,b,g3,e,8d,2c").play();
+            }
+        </script>            
+    </p>
+
+<p>
+    <button onclick="ThDemo.sequenceComplex()">play</button> A sequence using more notation.
+    <script>
+        ThDemo.sequenceComplex=function(arg) {
+            if(Th.Inst.get("InstSimple")==null) {
+                Th.Inst.create("InstSimple",ThDemo.sineFunc);
+                }
+            Th.Sequence.create("ComplicatedSeq","InstSimple","d=4,o=3,b=160,l=4:b,c,2(g),8c,8b,(C2 Eb2 G2 Bb2),1R").play();
+            }
+        </script>            
+    </p>
+    
+
+<p>
+    <button onclick="ThDemo.sequenceMulti()">play</button> A sequence using two instruments.
+    <script>
+        ThDemo.sequenceMulti=function(arg) {
+            Th.Inst.create("InstSimple",ThDemo.sineFunc);
+            Th.Inst.create("OtherInst",function(si, len,  frq, chn, opt) {
+                var fad=(len-si)/len; 
+                return Math.floor(fad*128*256*(
+                    .4*Math.sin(2.0 * Math.PI * frq * si  / 44100) +
+                    .3*Math.cos(2.01 * Math.PI * frq * si  / 44100) +
+                    .1*Math.sin(1.99 * Math.PI * fad * frq * si  / 44100)
+                    ));            
+                });
+            Th.Sequence.create("ComplicatedSeq",["InstSimple","OtherInst"],"d=4,o=3,b=100,l=2:a,b,c,d,i1,e,f,g,a#").play();
+            }
+        </script>            
+    </p>    
+
+
+</body>
+</html>
