@@ -109,7 +109,6 @@ var Th=new (function() { //may get a single option object argument
 
         return _.NOTES_SHARP_UPPER[(nix+_.NOTES_SHARP_UPPER.length*this.D_MAX_OCTAVE)%_.NOTES_SHARP_UPPER.length]+""+oct;
         }
-If duration is a function, it is called with no arguments, expecting a number to be returned which specifies the number of samples for this duration.  A number followed by a suffix of "m" or "ms" specifies milliseconds, e.g. "100m" means 100 milliseconds.  The suffix "b" means beats, so "2b" would mean two beats in the current tempo.  The suffix "s" means samples, so "431s" means 431 samples.  Finally, if duration is a number, it is assumed to be a number of beat.
     this.normalizeDuration=function(len) { //len can be number with optional suffix.  100m = 100ms, 1000s, 1b, 
         var smplen=0;
         if(!len) { 
