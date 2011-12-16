@@ -18,7 +18,7 @@ Thunder.js is a JavaScript library that aims to make it easy to create and play 
     sineInst.getSound( "B" ).play( 1 );    
     sineInst.getSound( "C2" ).play( 2 );        
     
-    //play songs using RTTL
+    //play songs using RTTTL
     var score="close encounters: d=4,o=3,b=120: d, e, c, p, c2., p, 2g2";
     Th.Sequence.create("CE Sine","SimpleSine",score).play();
 
@@ -192,7 +192,7 @@ The create function takes up to four arguments:
 
 * *id*                : An optional ThSequence identifier.
 * *inst*              : A required ThInst object or id, or array of ThInst objects or ids, which is used to play the notation provided.
-* *notation*          : A string containing RTTL (http://en.wikipedia.org/wiki/Ring_Tone_Transfer_Language) based music notation, with some additional capabilities described in the Thunder RTTL+ section.
+* *notation*          : A string containing RTTTL (http://en.wikipedia.org/wiki/Ring_Tone_Transfer_Language) based music notation, with some additional capabilities described in the Thunder RTTTL+ section.
 * *options*           : Optional options for the ThSequence creation, passed along to any ThSounds created internally.
 
 
@@ -205,7 +205,7 @@ Creates and manages a sequence of ThSounds.
 * *play()*           : Plays the ThSequence.        
 
 
-*Thunder's RTTL+* : A string specifying RTTL with some extra capabilities.
+*Thunder's RTTTL+* : A string specifying RTTTL with some extra capabilities.
 --------------------------------------------------------------------------
 The string may begin with a name followed by a colon.  For example, "Rock and roll: " would mean the sequence name is "Rock and roll".
 The next portion is header portion ending in a colon.  The header contains a comma seperated list of key/value pairs, each seperated by an equal sign.  The keys that are allowed for the header are as follows:

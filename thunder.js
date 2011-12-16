@@ -545,6 +545,12 @@ var Th=new (function() { //may get a single option object argument
                     return _.thunder.Sound.create("S",chanew[0],chanew[1],_.ext_opt);
                     };
                 
+                this.destroy=function() {
+                    for(var oi in _) {
+                        delete _[oi];
+                        }
+                    };
+                
                 })(this,_,id,ch1,ch2,opt);
                 
             _.map[id]=ThSound;
@@ -552,6 +558,10 @@ var Th=new (function() { //may get a single option object argument
             };
             
         this.get=function(id) { return _.map[id]; }
+        this.destroy=function(id) { 
+            _.map[id].destroy(); 
+            delete _.map[id];
+            }
         })(this,_);
 
 
@@ -670,7 +680,7 @@ var Th=new (function() { //may get a single option object argument
                     }
                 _.inst=ins;
                 
-                //Now we parse out the notation.  We are using RTTL with some relaxations and additions.  But RTTL input should work always
+                //Now we parse out the notation.  We are using RTTTL with some relaxations and additions.  But RTTTL input should work always
                 //example: ScoobyDoo:d=4,o=5,b=160:8e6,8e6,8d6,8d6,2c6,8d6,e6,2a,8a,b,g,e6,8d6,c6,8d6,2e6,p,8e6,8e6,8d6,8d6,2c6,8d6,f6,2a,8a,b,g,e6,8d6,2c6
                 //see: http://www.ez4mobile.com/nokiatone/rtttf.htm
                 ntn=ntn.split(":");
