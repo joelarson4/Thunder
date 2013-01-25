@@ -1,5 +1,4 @@
-/* 
-Copyright (c) 2011 by Joe Larson (http://joewlarson.com), MIT License
+/* Copyright (c) 2011 by Joe Larson (http://joewlarson.com), MIT License
  
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
@@ -21,7 +20,7 @@ var Th=new (function() { //may get a single option object argument
     this.D_HALF_STEP_DOWN =1/Math.pow(2,1/12);
     this.D_MAX_SAMPLE_16  =Math.pow(2,16-1)-1; //same for negative to keep it simple           
 
-    var _={};             //all private stuff goes here for code cleanliness
+    var _={};//all private stuff goes here for code cleanliness
     _.initialized=false;
 
     this.init=function(opt) {
@@ -57,20 +56,22 @@ var Th=new (function() { //may get a single option object argument
         _.NOTES_SHARP_UPPER=notshp.join(",").toUpperCase().split(",");
         _.NOTES_FLAT_UPPER =notflt.join(",").toUpperCase().split(",");
         _.initialized=true;
-        }
+        };
 
-    this.getMaxSample=function() { return this.D_MAX_SAMPLE_16; }
-    this.getTempo=function() { return _.tempo; }
-    this.getBeatLength=function() { return _.beatSamples; }
-    this.getAFrequency=function() { return _.aFreq; }
-    this.getFrequencyForNote=function(not) { return _.notesToFrequency[not.toUpperCase()]; }
-    this.getNoteForFrequency=function(frq) { return _.frequencyToNotes[frq]; }    
-    this.getChannelCount=function() { return _.channelCount; }
+    this.getMaxSample=function() { return this.D_MAX_SAMPLE_16; };
+    this.getTempo=function() { return _.tempo; };
+    this.getBeatLength=function() { return _.beatSamples; };
+    this.getAFrequency=function() { return _.aFreq; };
+    this.getFrequencyForNote=function(not) { return _.notesToFrequency[not.toUpperCase()]; };
+    this.getNoteForFrequency=function(frq) { return _.frequencyToNotes[frq]; };
+    this.getChannelCount=function() { return _.channelCount; };
     this.pitchToFrequency=function(ptc,reffrq) {// ptc is a pitch like A, A3, 440, -3, +5;
-        var ptcspl=ptc.toUpperCase().split("");
-        var ptcnum=Number(ptc);
+        var ptcspl=ptc.toUpperCase().split(""),
+            ptcnum=Number(ptc),
+            newfrq, oct;
         reffrq=reffrq || _.a4Freq;
-        var newfrq=reffrq;
+        
+        newfrq=reffrq;
         if(ptcspl[0]=="+" || ptcspl[0]=="-") {
             newfrq=reffrq*Math.pow(this.D_HALF_STEP_UP,ptcnum);
             }
@@ -78,7 +79,7 @@ var Th=new (function() { //may get a single option object argument
             newfrq=ptcnum;
             }
         else {
-            var oct=Number(ptcspl[ptcspl.length-1]);
+            oct=Number(ptcspl[ptcspl.length-1]);
             if(isNaN(oct)) { 
                 oct=this.D_CENTER_OCTAVE;
                 } 
@@ -86,20 +87,21 @@ var Th=new (function() { //may get a single option object argument
                 ptcspl.pop(); //now we'll have just the note
                 }
 
-            var newfrq=this.getFrequencyForNote(ptcspl.join("")+oct)
+            newfrq=this.getFrequencyForNote(ptcspl.join("")+oct);
             }    
         return newfrq;
-        }
+        };
     this.frequencyToNote=function(frq) {
         return _.frequencyRoundToNotes[Math.round(frq)];
-        }
+        };
     this.getOffsetNote=function(not,ofs) { //TODO: this is somewhat redundant with pitchToFrequency, distill into common code
-        var oct=Number(not.charAt(not.length-1)); 
+        var nix, 
+            oct=Number(not.charAt(not.length-1)); 
         if(isNaN(oct)) { oct=this.D_CENTER_OCTAVE; }
         else { not=not.substring(0,not.length-1); }
         
         not=not.toUpperCase();
-        var nix=0;
+        nix=0;
         for(;nix<_.NOTES_SHARP_UPPER.length; nix++) {
             if(_.NOTES_SHARP_UPPER[nix]==not || _.NOTES_FLAT_UPPER[nix]==not) { break; }
             }
@@ -108,7 +110,7 @@ var Th=new (function() { //may get a single option object argument
         oct=Math.floor((oct*12+nix)/12);
 
         return _.NOTES_SHARP_UPPER[(nix+_.NOTES_SHARP_UPPER.length*this.D_MAX_OCTAVE)%_.NOTES_SHARP_UPPER.length]+""+oct;
-        }
+        };
     this.normalizeDuration=function(len) { //len can be number with optional suffix.  100m = 100ms, 1000s, 1b, 
         var smplen=0;
         if(!len) { 
@@ -147,16 +149,17 @@ var Th=new (function() { //may get a single option object argument
             smplen=_.beatSamples*Number(len);
             }
         return { samples: smplen, ms: smplen*1000/this.D_SAMPLE_RATE, beats: smplen/_.beatSamples };
-        }
+        };
     
     _.serializeForId=function(opt,dep) {
+        var oi, str, frs;
         if(!opt) { return "~"; }
         if(!dep) { dep=0; }
         if(dep>3) { return "!"; }
-        var str="";
+        str="";
         if(typeof opt=="function") { return "()"; }
         else if(typeof opt=="object") {
-            var frs=true;
+            frs=true;
             str+=( opt.sort ? "[" : "{" );
             for(oi in opt) {
                 if(!frs) { str+=","; }
@@ -173,9 +176,10 @@ var Th=new (function() { //may get a single option object argument
         return argout;
         };
     _.splitOnWhiteComma=function(txt) { //return an array split on commas or whitespace
-        var arr=txt.split(",").join(" ").split(/\s/);                
-        for(var ai=arr.length-1; ai>-1; ai--) {
-            if(arr[ai]=="") { arr.splice(ai,1); }
+        var ai, 
+            arr=txt.split(",").join(" ").split(/\s/);                
+        for(ai=arr.length-1; ai>-1; ai--) {
+            if(arr[ai]==="") { arr.splice(ai,1); }
             }
         return arr;
         };
@@ -285,7 +289,7 @@ var Th=new (function() { //may get a single option object argument
             _.offset=40;
             this.outLong(_.samplesWritten*_.bytesPerSample);            
             return new Audio("data:audio/wav;base64,"+this.b64encode(_.out));
-            };
+            };    
         this.createAudio=function(ch1,ch2) {
             this.start();
             this.write(ch1,ch2);
@@ -295,7 +299,7 @@ var Th=new (function() { //may get a single option object argument
             };
         this.play=function(ch1,ch2) {
             this.create(ch1,ch2).play();
-            };        
+            };    
         };
     _.Effects={
         _:{
@@ -315,16 +319,17 @@ var Th=new (function() { //may get a single option object argument
                 return 1;
                 },
             normNumberParm:function(prm,strdft,strflb) {
+                var val, typ, newprm, ai, oi;
                 if(typeof prm=="string") {
                     prm=strdft[prm] || strflb || 1;
                     }
-                var val=prm;//step
-                var typ=( typeof prm );
+                val=prm;//step
+                typ=( typeof prm );
                 
                 if(typ=="object") {
-                    var newprm=[];
+                    newprm=[];
                     if(val.sort) {
-                        for(var ai=0; ai<val.length; ai++) {
+                        for(ai=0; ai<val.length; ai++) {
                             newprm.push({loc:ai/(val.length-1),step:val[ai]});
                             }
                         }
@@ -346,20 +351,19 @@ var Th=new (function() { //may get a single option object argument
                 }
             },
         speed:function(prm, charef) {
-            var prmnor=this._.normNumberParm(prm,{up:this._.thunder.D_HALF_STEP_UP,down:this._.thunder.D_HALF_STEP_DOWN},1);
-
-            var stpval;
-            var chanew=[];
-            for(var ci=0; ci<charef.length; ci++) {
+            var chanew, ci, ai, pi, prmnor, minpos, maxpos, maxval, stpval, smpval, sca;
+            prmnor=this._.normNumberParm(prm,{up:this._.thunder.D_HALF_STEP_UP,down:this._.thunder.D_HALF_STEP_DOWN},1);
+            chanew=[];
+            for(ci=0; ci<charef.length; ci++) {
                 chanew.push([]);
-                for(var ai=0; ai<charef[ci].length; ai+=stpval) {
+                for(ai=0; ai<charef[ci].length; ai+=stpval) {
                     stpval=( prmnor.type=="number" ? prmnor.value : this._.calcAdvance(prmnor.value,ai/charef[ci].length) );
-                    var minpos=Math.floor(ai);
-                    var maxpos=Math.min(charef[ci].length-1,Math.ceil(ai+stpval));
-                    var maxval=0; 
-                    var smpval=0;
-                    for(var pi=minpos; pi<maxpos; pi++) {
-                        var sca=1/(1+Math.abs(pi-ai));
+                    minpos=Math.floor(ai);
+                    maxpos=Math.min(charef[ci].length-1,Math.ceil(ai+stpval));
+                    maxval=0; 
+                    smpval=0;
+                    for(pi=minpos; pi<maxpos; pi++) {
+                        sca=1/(1+Math.abs(pi-ai));
                         maxval+=sca;
                         smpval+=charef[ci][pi]*sca;
                         }
@@ -369,46 +373,47 @@ var Th=new (function() { //may get a single option object argument
             return chanew;
             },
         volume:function(prm, charef) {
-            var prmnor=this._.normNumberParm(prm,{up:this._.thunder.D_HALF_STEP_UP,down:this._.thunder.D_HALF_STEP_DOWN},1);
+            var prmnor, chanew, ci, ai, val;
+            prmnor=this._.normNumberParm(prm,{up:this._.thunder.D_HALF_STEP_UP,down:this._.thunder.D_HALF_STEP_DOWN},1);
 
-            var stpval;
-            var chanew=[];
-            for(var ci=0; ci<charef.length; ci++) {
+            chanew=[];
+            for(ci=0; ci<charef.length; ci++) {
                 chanew.push([]);
-                for(var ai=0; ai<charef[ci].length; ai++) {
-                    var val=( prmnor.type=="number" ? prmnor.value : this._.calcAdvance(prmnor.value,ai/charef[ci].length) );
+                for(ai=0; ai<charef[ci].length; ai++) {
+                    val=( prmnor.type=="number" ? prmnor.value : this._.calcAdvance(prmnor.value,ai/charef[ci].length) );
                     chanew[ci].push(Math.floor(val*charef[ci][ai]));
                     }
                 }
             return chanew;
             },           
         noise:function(prm, charef) {
-            var prmnor=this._.normNumberParm(prm,{up:this._.thunder.D_HALF_STEP_UP,down:this._.thunder.D_HALF_STEP_DOWN},1);
+            var prmnor, chanew, ci, ai, val;
+            prmnor=this._.normNumberParm(prm,{up:this._.thunder.D_HALF_STEP_UP,down:this._.thunder.D_HALF_STEP_DOWN},1);
 
-            var stpval;
-            var chanew=[];
-            for(var ci=0; ci<charef.length; ci++) {
+            chanew=[];
+            for(ci=0; ci<charef.length; ci++) {
                 chanew.push([]);
-                for(var ai=0; ai<charef[ci].length; ai++) {
-                    var val=( prmnor.type=="number" ? prmnor.value : this._.calcAdvance(prmnor.value,ai/charef[ci].length) );
+                for(ai=0; ai<charef[ci].length; ai++) {
+                    val=( prmnor.type=="number" ? prmnor.value : this._.calcAdvance(prmnor.value,ai/charef[ci].length) );
                     chanew[ci].push( Math.floor(val*(Math.random()*2-1)*this._.thunder.getMaxSample()) +charef[ci][ai] );
                     }
                 }
             return chanew;
             },
-        sample:function(prm, charef) {
+        sample:function(prm, charef, extopt) {
+            var ci, ai, chanew=[];
             if(typeof prm!="function") { return charef; }
-            var chanew=[];
-            for(var ci=0; ci<charef.length; ci++) {
+            for(ci=0; ci<charef.length; ci++) {
                 chanew.push([]);
-                for(var ai=0; ai<charef[ci].length; ai++) {
+                for(ai=0; ai<charef[ci].length; ai++) {
                     chanew[ci].push(prm(charef[ci][ai], ai, charef[ci].length, ci, extopt));
                     }
                 }
             return chanew;
             },
         pitch:function(prm, charef, extopt) {
-            var prmpre={};
+            var pi, orgfrq, newfrq, 
+                prmpre={};
             if(typeof prm=="string") {
                 prmpre["0"]=prm;
                 }
@@ -416,33 +421,34 @@ var Th=new (function() { //may get a single option object argument
                 prmpre=prm;
                 }
             for(pi in prmpre) {
-                var orgfrq=extopt.freq;
-                var newfrq=this._.thunder.pitchToFrequency(prmpre[pi],orgfrq); //like: A, A3, 440, -3, +5
+                orgfrq=extopt.freq;
+                newfrq=this._.thunder.pitchToFrequency(prmpre[pi],orgfrq); //like: A, A3, 440, -3, +5
                 prmpre[pi]=newfrq/orgfrq;
                 }
             return this.speed(prmpre, charef);
             },
         mix:function(prm, charef) {
+            var sndarr, chanew, chamix, len, ai, si, ci, smp;
             if(typeof prm=="string") prm=this._.thunder.Sound.get(prm); 
             if(typeof prm!="object") return charef; 
-            var sndarr=( prm.sort ? prm : [prm] );
-            var chanew=[];
-            for(var si=0; si<sndarr.length; si++) {
+            sndarr=( prm.sort ? prm : [prm] );
+            chanew=[];
+            for(si=0; si<sndarr.length; si++) {
                 if(typeof sndarr[si]=="string") sndarr[si]=this._.thunder.Sound.get(sndarr[si]);
                 }
             
-            for(var ci=0; ci<charef.length; ci++) {
-                var chamix=[];
-                var len=charef[ci].length;
-                for(var si=0; si<sndarr.length; si++) {
+            for(ci=0; ci<charef.length; ci++) {
+                chamix=[];
+                len=charef[ci].length;
+                for(si=0; si<sndarr.length; si++) {
                     chamix.push(sndarr[si].getSampleArray(ci+1));
                     len=Math.max(len,chamix[chamix.length-1].length);
                     }
                 
                 chanew.push([]);
-                for(var ai=0; ai<len; ai++) {
-                    var smp=( charef[ci][ai] || 0 );
-                    for(var si=0; si<sndarr.length; si++) {
+                for(ai=0; ai<len; ai++) {
+                    smp=( charef[ci][ai] || 0 );
+                    for(si=0; si<sndarr.length; si++) {
                         smp+=( chamix[si][ai] || 0 );
                         }
                     chanew[ci].push(smp);
@@ -471,19 +477,20 @@ var Th=new (function() { //may get a single option object argument
             var ch2=arg.shift() || null; //may not be there
 
             var ThSound=new (function(sno,sn_,id,ch1,ch2,opt) {
+                var oi,
+                    _={
+                        sound       :sno,
+                        sound_      :sn_,
+                        thunder     :sn_.thunder,
+                        thunder_    :sn_.thunder_,
+                        id          :id ,
+                        arg_ch1     :ch1,
+                        arg_ch2     :ch2,
+                        arg_options :opt,
+                        ch1         :[],
+                        ch2         :[] 
+                        };
                 this.type="ThSound";
-                var _={
-                    sound       :sno,
-                    sound_      :sn_,
-                    thunder     :sn_.thunder,
-                    thunder_    :sn_.thunder_,
-                    id          :id ,
-                    arg_ch1     :ch1,
-                    arg_ch2     :ch2,
-                    arg_options :opt,
-                    ch1         :[],
-                    ch2         :[] 
-                    };
                 opt=opt || {}; 
                 
                 _.duration=( opt.duration ? _.thunder.normalizeDuration(opt.duration) : _.thunder_.beatDuration );
@@ -529,24 +536,29 @@ var Th=new (function() { //may get a single option object argument
 
                 this.getId=function() { return _.id; };
                 this.play =function(dlydur) {  
+                    var plaidn=_.id;
                     if(!dlydur) { this.getAudio().play(); return; }
-                    setTimeout("Th.Sound.get('"+_.id+"').play();",_.thunder.normalizeDuration(dlydur).ms);
-                    }
+                    setTimeout(function() {
+                        Th.Sound.get(plaidn).play();
+                        },_.thunder.normalizeDuration(dlydur).ms);
+                    };
                 this.getSampleArray=function(chn) { return _[ chn==2 ? "ch2arr" : "ch1arr" ]; };
                 
                 this.effect=function() {
+                    var ai, nam, prm, chanew;
                     //expecting arguments: name, parms, [,name, parms]... -- as many pairs as you want, and what parms is differs by effect
                     chanew=[_.ch1arr,_.ch2arr];
-                    for(var ai=0; ai<arguments.length; ai+=2) {
-                        var nam=arguments[ai];
-                        var prm=arguments[ai+1];
+                    for(ai=0; ai<arguments.length; ai+=2) {
+                        nam=arguments[ai];
+                        prm=arguments[ai+1];
                         chanew=_.thunder_.Effects[nam](prm,chanew,_.ext_opt);
                         }
                     return _.thunder.Sound.create("S",chanew[0],chanew[1],_.ext_opt);
                     };
                 
                 this.destroy=function() {
-                    for(var oi in _) {
+                    var oi;
+                    for(oi in _) {
                         delete _[oi];
                         }
                     };
@@ -557,11 +569,11 @@ var Th=new (function() { //may get a single option object argument
             return ThSound;
             };
             
-        this.get=function(id) { return _.map[id]; }
+        this.get=function(id) { return _.map[id]; };
         this.destroy=function(id) { 
             _.map[id].destroy(); 
             delete _.map[id];
-            }
+            };
         })(this,_);
 
 
@@ -583,18 +595,19 @@ var Th=new (function() { //may get a single option object argument
             var ch2=arg.shift() || null; //may not be there
 
             var ThInst=new (function(ino,in_,id,ch1,ch2,opt) {
+                var oi,
+                    _={
+                        inst        :ino,
+                        inst_       :in_,
+                        thunder     :in_.thunder,
+                        thunder_    :in_.thunder_,
+                        id          :id ,
+                        arg_ch1     :ch1,
+                        arg_ch2     :ch2,
+                        arg_options :opt,
+                        sounds      :{}
+                        };
                 this.type="ThInst";
-                var _={
-                    inst        :ino,
-                    inst_       :in_,
-                    thunder     :in_.thunder,
-                    thunder_    :in_.thunder_,
-                    id          :id ,
-                    arg_ch1     :ch1,
-                    arg_ch2     :ch2,
-                    arg_options :opt,
-                    sounds      :{}
-                    };
                 opt=opt || {}; 
 
                 _.duration=( opt.duration ? _.thunder.normalizeDuration(opt.duration) : _.thunder_.beatDuration );
@@ -603,16 +616,17 @@ var Th=new (function() { //may get a single option object argument
                 _.ext_opt.duration=_.duration;
 
                 this.getSound=function(ptc,opt) {
+                    var frq, id, snd, oi;
                     opt=opt || {};
-                    var frq=_.thunder.pitchToFrequency(ptc);
-                    var id=_.id+"_"+ptc+( opt ? ":"+_.thunder_.serializeForId(opt) : "" );
+                    frq=_.thunder.pitchToFrequency(ptc);
+                    id=_.id+"_"+ptc+( opt ? ":"+_.thunder_.serializeForId(opt) : "" );
                     opt.freq =opt.freq || frq;
                     opt.pitch=opt.pitch || ptc;
                     opt.duration=( opt.duration ? _.thunder.normalizeDuration(opt.duration) : _.duration );
                     
                     for(oi in _.ext_opt) { if(!opt[oi]) opt[oi]=_.ext_opt[oi]; }
                     
-                    var snd=_.sounds[id];
+                    snd=_.sounds[id];
                     if(!snd) {
                         snd=_.thunder.Sound.create(id,_.arg_ch1,_.arg_ch2,opt);
                         _.sounds[id]=snd;
@@ -627,7 +641,7 @@ var Th=new (function() { //may get a single option object argument
             return ThInst;
             };            
 
-        this.get=function(id) { return _.map[id]; }
+        this.get=function(id) { return _.map[id]; };
         })(this,_);         
         
 
@@ -640,17 +654,20 @@ var Th=new (function() { //may get a single option object argument
             }; 
 
         this.create=function() { //create and return a new ThunderSequence object
-            var arg=_.thunder_.getArgumentArray(arguments);//expecting arguments: [id] , inst, [, notation] [, options ]
-            var id ="Sequence_"+_.counter++; 
+            var arg, id, opt, ins, ntn, eqlspl, sp2, tmp, out, len, not, bea, ThSequence;
+            arg=_.thunder_.getArgumentArray(arguments);//expecting arguments: [id] , inst, [, notation] [, options ]
+            id ="Sequence_"+_.counter++; 
             if(typeof arg[0]=="string") id=arg.shift();
-            var opt=arg.pop();
+            opt=arg.pop();
             if(typeof opt!="object" || opt.sort) { arg.push(opt); opt=null; } //we only think it's options if it's a non-array object
-            var ins=arg.shift(); //instruments may be a string id, a ThInst object, a ThSound object, or an array of those 
-            var ntn=arg.shift(); //may not be there
+            ins=arg.shift(); //instruments may be a string id, a ThInst object, a ThSound object, or an array of those 
+            ntn=arg.shift(); //may not be there
             
-            var ThSequence=new (function(sqo,sq_,id,ins,ntn,opt) {
-                this.type="ThSequence";
-                var _={
+            ThSequence=new (function(sqo,sq_,id,ins,ntn,opt) {
+                var ntnmus, ntnset, ntnnam, ni, beastr, insidx, haschr, 
+                    spl, chrdot, chroct, chrlen, chrnot, chrnotlen, 
+                    sub, maj, min, oct, roo, ci, ii, _;
+                _={
                     sequence     :sqo,
                     sequence_    :sq_,
                     thunder      :sq_.thunder,
@@ -661,6 +678,7 @@ var Th=new (function() { //may get a single option object argument
                     arg_options  :opt,
                     inst         :null //set later
                     };
+                this.type="ThSequence";
                 opt=opt || {}; 
                 
                 _.tempo       =opt.tempo  || _.thunder_.tempo;
@@ -669,7 +687,7 @@ var Th=new (function() { //may get a single option object argument
                 _.loops       =opt.loops      || 1;
 
                 if(typeof ins!="object" || !ins.sort) { ins=[ins]; }
-                for(var ii=0; ii<ins.length; ii++) {
+                for(ii=0; ii<ins.length; ii++) {
                     if(typeof ins[ii]=="string") { 
                         ins[ii]=( _.thunder.Inst.get(ins[ii]) || _.thunder.Sound.get(ins[ii]) ); 
                         }
@@ -684,9 +702,9 @@ var Th=new (function() { //may get a single option object argument
                 //example: ScoobyDoo:d=4,o=5,b=160:8e6,8e6,8d6,8d6,2c6,8d6,e6,2a,8a,b,g,e6,8d6,c6,8d6,2e6,p,8e6,8e6,8d6,8d6,2c6,8d6,f6,2a,8a,b,g,e6,8d6,2c6
                 //see: http://www.ez4mobile.com/nokiatone/rtttf.htm
                 ntn=ntn.split(":");
-                var ntnmus=ntn.pop(); //the music portion of the notation
-                var ntnset=ntn.pop(); //the settings portion, if any
-                var ntnnam=ntn.pop(); //the name poriton, if any
+                ntnmus=ntn.pop(); //the music portion of the notation
+                ntnset=ntn.pop(); //the settings portion, if any
+                ntnnam=ntn.pop(); //the name poriton, if any
                 
                 _.notationName=ntnnam; //informational only
 
@@ -696,8 +714,8 @@ var Th=new (function() { //may get a single option object argument
                     while(ntnset.indexOf("= ")>-1) { ntnset=ntnset.split("= ").join("="); }                    
                     ntnset=_.thunder_.splitOnWhiteComma(ntnset.toUpperCase());
                     
-                    for(var ni=0; ni<ntnset.length; ni++) {
-                        var eqlspl=ntnset[ni].split("=");
+                    for(ni=0; ni<ntnset.length; ni++) {
+                        eqlspl=ntnset[ni].split("=");
                         if(     eqlspl[0]=="D") _.noteLength  =Number(eqlspl[1]);
                         else if(eqlspl[0]=="O") _.octave      =Number(eqlspl[1]);
                         else if(eqlspl[0]=="B") _.tempo       =Number(eqlspl[1]);  
@@ -709,13 +727,13 @@ var Th=new (function() { //may get a single option object argument
                 _.beatMs     =60*1000/_.tempo;    
                 _.beatDuration={ ms: _.beatMs, samples: _.beatSamples };
 
-                var haschr=( ntnmus.indexOf("(")>-1 ); //has chords
+                haschr=( ntnmus.indexOf("(")>-1 ); //has chords
                 ntnmus=ntnmus.split("M").join("J"); //internally we use J for major.  M means minor because it's uppercased
                 ntnmus=_.thunder_.splitOnWhiteComma(ntnmus.toUpperCase());
-                var beastr=0;
-                var insidx=0;
+                beastr=0;
+                insidx=0;
                 _.score=[];
-                if(haschr) {
+                if(haschr) {                    
                     //- allow chords using (). 
                     //  (G) would be a G major chord in default octave
                     //  (Gj) will also be considered major.  this allows for easily building up more complex chords
@@ -723,21 +741,21 @@ var Th=new (function() { //may get a single option object argument
                     //  3(A E1 G0) is a chord composed of A in the default octave, E1 and G0, played for 3 beats
                     //  others: 2(Gm).3
                     //  we don't try to accomodate 9th, 7th, diminished, whatever -- people can construct those by hand!
-                    for(var ni=ntnmus.length-1; ni>-1; ni--) {
+                    for(ni=ntnmus.length-1; ni>-1; ni--) {
                         if(ntnmus[ni].indexOf(")")>-1) { 
                             //first we build an array of the seperate notes involved, and also get the duration and octave, by parsing and stepping backwards until we get a open paren    
-                            var spl=ntnmus[ni].split(")"); 
-                            var chrdot=( spl[1] && spl[1].indexOf(".")>-1 ); 
+                            spl=ntnmus[ni].split(")"); 
+                            chrdot=( spl[1] && spl[1].indexOf(".")>-1 ); 
                             if(chrdot) spl[1]=spl[1].split(".").join("");
-                            var chroct=Number(spl[1]); if(isNaN(chroct)) chroct=_.octave; //chord octave
-                            var chrlen=_.noteLength/( chrdot ? 1.5 : 1 );
-                            var chrnot=[];
+                            chroct=Number(spl[1]); if(isNaN(chroct)) chroct=_.octave; //chord octave
+                            chrlen=_.noteLength/( chrdot ? 1.5 : 1 );
+                            chrnot=[];
                             
                             if(spl[0].indexOf("(")>-1) { //check if this is the beginning paren also
                                 ntnmus[ni]=spl[0];
                                 ni++;                                
                                 }
-                            else if(spl[0]!="") { //nonblank means its a note to be included
+                            else if(spl[0]!=="") { //nonblank means its a note to be included
                                 chrnot.push(spl[0]); 
                                 ntnmus.splice(ni,1); //remove current node, so we can reinsert with same code
                                 }
@@ -749,9 +767,9 @@ var Th=new (function() { //may get a single option object argument
                             while(ni>0 && ntnmus.length>0) {
                                 ni--;
                                 if(ntnmus[ni].indexOf("(")>-1) {
-                                    var sp2=ntnmus[ni].split("("); 
-                                    if(sp2[0]!="") chrlen=Number(sp2[0])/( chrdot ? 1.5 : 1 );
-                                    if(sp2[1]!="") chrnot.push(sp2[1]);
+                                    sp2=ntnmus[ni].split("("); 
+                                    if(sp2[0]!=="") chrlen=Number(sp2[0])/( chrdot ? 1.5 : 1 );
+                                    if(sp2[1]!=="") chrnot.push(sp2[1]);
                                     ntnmus.splice(ni,1); //delete current node
                                     break;
                                     }
@@ -766,21 +784,21 @@ var Th=new (function() { //may get a single option object argument
                             
                             //if we have a single note, make sure it's major or minor.  So G becomes GJ, Gm is GM
                             if(chrnot.length==1 && chrnot[0].indexOf("J")<0 && chrnot[0].indexOf("M")<0) {
-                                var tmp=chrnot[0].split("");
-                                tmp.splice(1,0,"J")
+                                tmp=chrnot[0].split("");
+                                tmp.splice(1,0,"J");
                                 chrnot[0]=tmp.join("");
                                 }
                             
                             //now we split out the chords into component notes
-                            var chrnotlen=chrnot.length;
-                            for(var ci=0; ci<chrnotlen; ci++) {
-                                var sub=chrnot[ci];
-                                var maj=(sub.indexOf("J")>-1); if(maj) sub=sub.split("J").join("");
-                                var min=(sub.indexOf("M")>-1); if(min) sub=sub.split("M").join("");
-                                var oct=Number(sub.charAt(sub.length-1)); 
+                            chrnotlen=chrnot.length;
+                            for(ci=0; ci<chrnotlen; ci++) {
+                                sub=chrnot[ci];
+                                maj=(sub.indexOf("J")>-1); if(maj) sub=sub.split("J").join("");
+                                min=(sub.indexOf("M")>-1); if(min) sub=sub.split("M").join("");
+                                oct=Number(sub.charAt(sub.length-1)); 
                                 if(isNaN(oct)) { oct=_.octave; }
                                 else { sub=sub.substring(0,sub.length-1); }
-                                var roo=sub+oct; 
+                                roo=sub+oct; 
                                 chrnot[ci]=roo;
                                 if(maj) {
                                     chrnot.push(_.thunder.getOffsetNote(roo,4));//4 semitones means major third
@@ -794,7 +812,7 @@ var Th=new (function() { //may get a single option object argument
                             
                             //alert("C: "+ntnmus+" \n "+chrnot+" : "+ni);
                             
-                            for(var ci=0; ci<chrnot.length; ci++) {
+                            for(ci=0; ci<chrnot.length; ci++) {
                                 if(ci>0) ntnmus.splice(ni,0, chrlen+"K"); //insert backtrack
                                 ntnmus.splice(ni,0, chrlen+chrnot[ci]); //insert note
                                 }
@@ -803,15 +821,15 @@ var Th=new (function() { //may get a single option object argument
                         }
                     }
 
-                for(var ni=0; ni<ntnmus.length; ni++) {
-                    var out=ntnmus[ni].split(/[A-Z]/); //gives us the piece before and after note
-                    var len=Number(out[0]) || _.noteLength;
-                    var not=ntnmus[ni].substring(out[0].length,ntnmus[ni].length-out[1].length);
+                for(ni=0; ni<ntnmus.length; ni++) {
+                    out=ntnmus[ni].split(/[A-Z]/); //gives us the piece before and after note
+                    len=Number(out[0]) || _.noteLength;
+                    not=ntnmus[ni].substring(out[0].length,ntnmus[ni].length-out[1].length);
                     if(out[1].indexOf(".")>-1) { len/=1.5; out[1]=out[1].split(".").join(""); }
                     if(out[1].indexOf("#")>-1) { not+="#"; out[1]=out[1].split("#").join(""); }
-                    var oct=Number(out[1]); if(out[1]=="" || isNaN(oct)) oct=_.octave;  
+                    oct=Number(out[1]); if(out[1]==="" || isNaN(oct)) oct=_.octave;  
                     
-                    var bea=4/len; //TODO: incorperate notion of a time signature. 4 means default quarter notes -- not necessarily so.
+                    bea=4/len; //TODO: incorperate notion of a time signature. 4 means default quarter notes -- not necessarily so.
                     
                     if(not=="P") { //pause
                         beastr+=bea;
@@ -834,7 +852,7 @@ var Th=new (function() { //may get a single option object argument
                     }
                 _.sequenceBeats=beastr;
                 
-                this.getName=function() { return _.notationName || _.id; }
+                this.getName=function() { return _.notationName || _.id; };
                 this.getId=function() { return _.id; };
                 
                 this.play=function() {
@@ -846,7 +864,7 @@ var Th=new (function() { //may get a single option object argument
                             setTimeout("Th.Inst.get('"+insidn+"').getSound('"+_.score[si].note+"',{duration:'"+dursmp+"'}).play()",strmsc);
                             }
                         }
-                    }
+                    };
                 
                 })(this,_,id,ins,ntn,opt);
                 
@@ -854,7 +872,7 @@ var Th=new (function() { //may get a single option object argument
             return ThSequence;
             };            
 
-        this.get=function(id) { return _.map[id]; }
+        this.get=function(id) { return _.map[id]; };
         })(this,_);                 
         
     })();
