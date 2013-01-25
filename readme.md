@@ -22,6 +22,10 @@ Thunder.js is a JavaScript library that aims to make it easy to create and play 
     var score="close encounters: d=4,o=3,b=120: d, e, c, p, c2., p, 2g2";
     Th.Sequence.create("CE Sine","SimpleSine",score).play();
 
+Coding Style
+------------
+When I wrote this code I was expirimenting with different styles of constructing nontrivial JavaScript codebases.  So this code has some unconventional things going on.  If I ever get time, I am going to fix it.  In the meantime I've at least run JSHint and fixed most of the problems it found.
+
 Browser Support
 ---------------
 
